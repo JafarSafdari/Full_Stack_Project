@@ -1,0 +1,30 @@
+{% load static from staticfiles %}
+<!DOCTYPE html>
+<HTml>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{% static 'style.css' %}">
+    </head>
+        <body>
+            <div id="login">
+                <h1>Login</h1>
+                <form action="">
+                    <div>
+                        <label for="username">Username: </label>
+                        <input type="text" name="username" id="username" placeholder="Username" required>
+                    </div>
+                    <div>
+                        <label for="password">Password: </label>
+                        <input type="password" name="password" id="password" placeholder="Password" required>
+                    </div>
+                    <div>
+                        <button id="submit" type="submit">Submit</button>
+                    </div> 
+                    <div>
+                        <button id="register_button" type="button">Register</button>
+                    </div> 
+                </form>
+            </div>  
+        </body>
+
+</HTml>

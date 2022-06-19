@@ -1,0 +1,14 @@
+{% extends 'base_layout.html'%}
+{% block content %}
+        <h1>Avalble Cars vill be shown here</h1>
+        <div class="cars">
+            {% for car in cars %}
+            <div class="car">
+                <h2><a href="#">{{car.reg}}</a></h2>
+                <p>{{car.fabric}}</p>
+                <p>{{car.color}}</p>
+                <p>{{car.info}}</p>
+            </div>
+            {% endfor%}
+        </div>
+        {% endblock %}

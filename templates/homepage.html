@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- meta http-equiv="refresh" content="2" !-->
+    <style>
+      body {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      }
+
+      div {
+      text-align: center;
+      width: 25%;
+      height: 80%;
+      
+      float: left;
+      }
+
+      #div1 {
+      background: #DDD;
+      }
+
+      #div2 {
+      background: #AAA;
+      }
+
+      #div3 {
+      background: #777;
+      }
+
+      #div4 {
+      background: #444;
+      }
+      h1 {
+          text-align: center;
+          font-size: 80px;
+          margin: 50px;
+
+      }
+
+
+  </style>
+
+    <title>Enkelt test av JSON AJAX</title>
+    <meta charset="utf-8"/>
+</head>
+<body>
+  <h1>Welcome to the Carpool</h1>
+  <div id="div1">
+    <h2>Formulär för bokning av bilar</h2>
+    <h3 id="felmedellande"></h3>
+      <form action="javascript:booking()">
+        <label for="name">Skriv in ditt namn: </label>
+        <input type="text" name="name" id="name"><br>
+        <label for="reg_lessee">Skriv in bilens reg: </label>
+        <input type="text" name="reg_lessee" id="reg_lessee"><br>
+        <button id="booking">Boka</button>
+      </form>
+  </div>  
+
+  <div id="div2">
+      <h2>Formulär för visnig av lediga bilar</h2>
+      <form action="javascript:makeRequest()">
+        <table id="mintabell">
+          <tr>
+      <td>Reg</td><td>model</td><td>color</td><td>Lessee</td>
+          </tr>
+      </table>  
+      <button id="ajaxButton" type="button">Visa</button><br>
+      </form>
+  </div>
+
+  <div id="div3">
+      <h2>Add ny bil i databasen</h2>
+      <form action="javascript:sendRequest()">
+          <label for="reg">Regnummer: </label>
+          <input type="text" name="reg" id="reg"><br>
+          <label for="modell">Bilens modell : </label>
+          <input type="text" name="modell" id="modell"><br>
+          <label for="color">Bilens färg: </label>
+          <input type="text" name="color" id="color"><br>
+          <button id="insert_car">Add new car</button>
+        </form>
+  </div>
+
+  <div id="div4">
+    <h2>Formulär för åtelämning av bilar</h2>
+      <form action="javascript:leaving()">
+        <label for="name_leaving">Skriv in ditt namn: </label>
+        <input type="text" name="name_leaving" id="name_leaving"><br>
+        <label for="reg_leave">Skriv in bilens reg: </label>
+        <input type="text" name="reg_leave" id="reg_leave"><br>
+        <button id="leaving">Lämna</button>
+      </form>
+  </div>
+
+
+<script>
+ (function() 
+  {
+    
+    var httpRequest;
+    document.getElementById("ajaxButton").addEventListener('click', makeRequest);
+    console.log("abc");
+    function makeRequest() 
+    {
+      httpRequest = new XMLHttpRequest();
+      if (!httpRequest) 
+        {
+          alert('Giving up :( Cannot create an XMLHTTP instance');
+          return false;
+        }
+      httpRequest.onreadystatechange = handleResponse;
+      httpRequest.open('GET', '/api/bilar');
+      httpRequest.send();
+    }
+    
+    var httpsend;
+    document.getElementById("insert_car").addEventListener('click', sendRequest);
+   
+    function sendRequest()
+      {
+        var xhr = new XMLHttpRequest();
+        var url = '/api/add_bilar'
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () 
+          {
+            if (xhr.readyState === 4 && xhr.status === 200) 
+              {
+                var json = JSON.parse(xhr.responseText);
+              }
+          }
+        var regnumber = document.getElementById('reg').value;
+        var model = document.getElementById('modell').value;
+        var color = document.getElementById('color').value;
+        console.log(regnumber,model,color);
+        var data = JSON.stringify({"Regnumber": regnumber, "Model": model, 'Color': color});
+        xhr.send(data);
+      }
+     
+    function addrow(txt1, txt2,txt3,txt4) 
+      {
+        let tbl = document.getElementById("mintabell");
+        let tr = document.createElement("tr");
+        tbl.appendChild(tr);
+        let td1 = document.createElement("td");
+        let td2 = document.createElement("td");
+        let td3 = document.createElement("td");
+        let td4 = document.createElement("td");
+        tr.appendChild(td1)
+        tr.appendChild(td2)
+        tr.appendChild(td3)
+        tr.appendChild(td4)
+        td1.textContent = txt1;
+        td2.textContent = txt2;
+        td3.textContent = txt3;
+        td4.textContent = txt4;
+      }
+
+    function handleResponse() 
+      {
+        if (httpRequest.readyState == 4 && httpRequest.status == 200) 
+          {
+            var myArr = JSON.parse(httpRequest.responseText);
+            var Parent = document.getElementById('mintabell');
+            while(Parent.hasChildNodes())
+              {
+                Parent.removeChild(Parent.firstChild);
+              }
+            for(let i = 0; i < myArr.length; i++)
+              { 
+                console.log(myArr.length)
+                console.log(myArr[i]['RegNumber'],myArr[i]['Model'], myArr[i]['Color'], myArr[i]['Ressee']);
+                addrow(myArr[i]['RegNumber'],myArr[i]['Model'], myArr[i]['Color'],myArr[i]['Ressee']);  
+              } 
+          }
+      }
+    document.getElementById("booking").addEventListener('click', booking);
+    function booking()
+      {
+        var xhr = new XMLHttpRequest();
+        var url = '/api/booking'
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () 
+          {
+            if (xhr.readyState === 4 && xhr.status === 200) 
+              {
+                var json = JSON.parse(xhr.responseText);
+              }
+          }
+        var regnumber = document.getElementById('reg_lessee').value;
+        var name = document.getElementById('name').value;
+        console.log(regnumber,name)
+        var data = JSON.stringify({"RegNumber": regnumber, "Name": name});
+        console.log(data)
+        xhr.send(data);
+
+      }
+
+    document.getElementById("leaving").addEventListener('click', leaving);
+    function leaving()
+      {
+        var xhr = new XMLHttpRequest();
+        var url = '/api/leaving'
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () 
+          {
+            if (xhr.readyState === 4 && xhr.status === 200) 
+              {
+                var json = JSON.parse(xhr.responseText);
+              }
+          }
+        var regnumber = document.getElementById('reg_leave').value;
+        var name = document.getElementById('name_leaving').value;
+        console.log(regnumber,name)
+        var data = JSON.stringify({"RegNumber": regnumber, "Name": name});
+        console.log(data)
+        xhr.send(data);
+
+      }
+
+    function alertContents() 
+      {
+        if (httpRequest.readyState === XMLHttpRequest.DONE) 
+          {
+            if (httpRequest.status === 200) 
+              {
+                alert(httpRequest.responseText);
+              } 
+            else 
+              {
+                alert('There was a problem with the request.');
+              }
+          }
+      }
+ })();
+</script>
+</body>
+</html>
